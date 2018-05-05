@@ -72,6 +72,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="views\SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -87,6 +90,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\carousel-logo.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\carousel\carousel.csproj">
+      <Project>{4260B798-9F74-42E4-84A3-D21F1C08EA49}</Project>
+      <Name>carousel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Add_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Refresh_grey_16xMD.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Remove_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
