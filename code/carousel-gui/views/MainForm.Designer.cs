@@ -30,7 +30,6 @@
         {
             this.GamesListBox = new System.Windows.Forms.ListBox();
             this.ConfigureGameButton = new System.Windows.Forms.Button();
-            this.StartGameButton = new System.Windows.Forms.Button();
             this.SettingsButton = new System.Windows.Forms.Button();
             this.RefreshButton = new System.Windows.Forms.Button();
             this.RemoveButton = new System.Windows.Forms.Button();
@@ -52,18 +51,9 @@
             this.ConfigureGameButton.Name = "ConfigureGameButton";
             this.ConfigureGameButton.Size = new System.Drawing.Size(102, 47);
             this.ConfigureGameButton.TabIndex = 1;
-            this.ConfigureGameButton.Text = "Configure game";
+            this.ConfigureGameButton.Text = "Configure and start game";
             this.ConfigureGameButton.UseVisualStyleBackColor = true;
             this.ConfigureGameButton.Click += new System.EventHandler(this.ConfigureGameButton_Click);
-            // 
-            // StartGameButton
-            // 
-            this.StartGameButton.Location = new System.Drawing.Point(248, 65);
-            this.StartGameButton.Name = "StartGameButton";
-            this.StartGameButton.Size = new System.Drawing.Size(102, 48);
-            this.StartGameButton.TabIndex = 2;
-            this.StartGameButton.Text = "Start game";
-            this.StartGameButton.UseVisualStyleBackColor = true;
             // 
             // SettingsButton
             // 
@@ -91,6 +81,7 @@
             // 
             this.RemoveButton.BackgroundImage = global::carousel_gui.Properties.Resources.Remove_16x;
             this.RemoveButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.RemoveButton.Enabled = false;
             this.RemoveButton.FlatAppearance.BorderSize = 0;
             this.RemoveButton.Location = new System.Drawing.Point(184, 334);
             this.RemoveButton.Name = "RemoveButton";
@@ -102,6 +93,7 @@
             // 
             this.AddButton.BackgroundImage = global::carousel_gui.Properties.Resources.Add_16x;
             this.AddButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.AddButton.Enabled = false;
             this.AddButton.FlatAppearance.BorderSize = 0;
             this.AddButton.Location = new System.Drawing.Point(153, 334);
             this.AddButton.Name = "AddButton";
@@ -118,7 +110,6 @@
             this.Controls.Add(this.RemoveButton);
             this.Controls.Add(this.AddButton);
             this.Controls.Add(this.SettingsButton);
-            this.Controls.Add(this.StartGameButton);
             this.Controls.Add(this.ConfigureGameButton);
             this.Controls.Add(this.GamesListBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
@@ -134,7 +125,6 @@
 
         private System.Windows.Forms.ListBox GamesListBox;
         private System.Windows.Forms.Button ConfigureGameButton;
-        private System.Windows.Forms.Button StartGameButton;
         private System.Windows.Forms.Button SettingsButton;
         private System.Windows.Forms.Button AddButton;
         private System.Windows.Forms.Button RemoveButton;

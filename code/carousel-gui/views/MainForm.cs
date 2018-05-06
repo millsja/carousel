@@ -66,7 +66,6 @@ namespace carousel_gui
             if (this.GamesListBox.SelectedIndex == -1)
             {
                 this.ConfigureGameButton.Enabled = false;
-                this.StartGameButton.Enabled = false;
             }
         }
 
@@ -80,7 +79,7 @@ namespace carousel_gui
             var game = this.GamesListBox.SelectedItem;
             if (game is GameDto)
             {
-                new ConfigureGameForm((GameDto)this.GamesListBox.SelectedItem).ShowDialog();
+                new ConfigureGameForm((GameDto)this.GamesListBox.SelectedItem, this._Client).ShowDialog();
             }
         }
     }
