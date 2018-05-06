@@ -1,6 +1,5 @@
 ﻿using carousel;
 using carousel.models;
-using carousel_gui.utilities;
 using carousel_gui.views;
 using System;
 using System.Collections.Generic;

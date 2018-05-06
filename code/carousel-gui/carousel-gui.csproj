@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="utilities\ProgressWorker.cs" />
     <Compile Include="views\ConfigureGameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,6 +124,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\Remove_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="utilities\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -15,16 +15,29 @@ namespace carousel_gui.views
     {
         private CancellationTokenSource _CancelSource;
 
-        public ProgressForm(CancellationTokenSource cancelSource)
+        public ProgressForm(CancellationTokenSource cancelSource, string formText)
         {
             InitializeComponent();
-            this._CancelSource = cancelSource;
+
+            this.ActionLabel.Text = formText;
+
+            cancelSource.Token.Register(() =>
+            {
+                this.BeginInvoke(new InvokeDelegate(CloseWindow));
+            });
         }
 
-        private void CancelButton_Click(object sender, EventArgs e)
+        private delegate void InvokeDelegate();
+
+        private void CloseWindow()
         {
-            this._CancelSource.Cancel();
             this.Close();
         }
+
+        // private void CancelButton_Click(object sender, EventArgs e)
+        // {
+        //     this._CancelSource.Cancel();
+        //     this.Close();
+        // }
     }
 }

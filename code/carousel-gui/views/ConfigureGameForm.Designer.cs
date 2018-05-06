@@ -33,6 +33,7 @@
             this.SetExePathButton = new System.Windows.Forms.Button();
             this.ExePathLabel = new System.Windows.Forms.Label();
             this.StartGameButton = new System.Windows.Forms.Button();
+            this.DeleteBackupsButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.GameFileDataTable)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,16 +84,28 @@
             this.StartGameButton.UseVisualStyleBackColor = true;
             this.StartGameButton.Click += new System.EventHandler(this.StartGameButton_Click);
             // 
+            // DeleteBackupsButton
+            // 
+            this.DeleteBackupsButton.Location = new System.Drawing.Point(144, 196);
+            this.DeleteBackupsButton.Name = "DeleteBackupsButton";
+            this.DeleteBackupsButton.Size = new System.Drawing.Size(147, 23);
+            this.DeleteBackupsButton.TabIndex = 5;
+            this.DeleteBackupsButton.Text = "Delete local backup files";
+            this.DeleteBackupsButton.UseVisualStyleBackColor = true;
+            this.DeleteBackupsButton.Click += new System.EventHandler(this.DeleteBackupsButton_Click);
+            // 
             // ConfigureGameForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(567, 227);
+            this.Controls.Add(this.DeleteBackupsButton);
             this.Controls.Add(this.StartGameButton);
             this.Controls.Add(this.ExePathLabel);
             this.Controls.Add(this.SetExePathButton);
             this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.GameFileDataTable);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Name = "ConfigureGameForm";
             this.Text = "Configure Game";
             ((System.ComponentModel.ISupportInitialize)(this.GameFileDataTable)).EndInit();
@@ -107,5 +120,6 @@
         private System.Windows.Forms.Button SetExePathButton;
         private System.Windows.Forms.Label ExePathLabel;
         private System.Windows.Forms.Button StartGameButton;
+        private System.Windows.Forms.Button DeleteBackupsButton;
     }
 }

@@ -94,11 +94,11 @@ namespace carousel
         }
 
         /// <summary>
-        /// gets file list from remote directory
+        /// gets file metadata list from remote directory
         /// </summary>
         /// <param name="filter">filter to apply to file list</param>
         /// <returns>files list</returns>
-        public IList<Google.Apis.Drive.v3.Data.File> GetFiles(Predicate<Google.Apis.Drive.v3.Data.File> filter)
+        public IList<Google.Apis.Drive.v3.Data.File> GetFilesMetadata(Predicate<Google.Apis.Drive.v3.Data.File> filter)
         {
             if (_UserCredentials != null)
             {
@@ -111,7 +111,6 @@ namespace carousel
                 var listRequest = service.Files.List();
                 listRequest.PageSize = 500;
                 listRequest.Fields = "nextPageToken, files(id, name, parents)";
-
 
                 var fullFileList = new List<Google.Apis.Drive.v3.Data.File>();
                 var page = new List<Google.Apis.Drive.v3.Data.File>();
@@ -139,7 +138,7 @@ namespace carousel
         /// <returns>list of game data objects</returns>
         public IList<GameDto> GetGamesList()
         {
-            var filesList = this.GetFiles((f) => true);
+            var filesList = this.GetFilesMetadata((f) => true);
 
             var root = filesList.Where((f) => f.Name == Constants.RootPath).First();
 
@@ -171,6 +170,34 @@ namespace carousel
             }
 
             return gamesList;
+        }
+
+        /// <summary>
+        /// takes a list of game data objects and downloads each to its
+        /// respective local path
+        /// </summary>
+        /// <param name="gameFiles">list of gamedto objects</param>
+        public void DownloadFiles(IList<FileDto> gameFiles)
+        {
+            if (_UserCredentials != null)
+            {
+                var service = new DriveService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = this._UserCredentials,
+                    ApplicationName = this._ApplicationName,
+                });
+
+                foreach (var gameFile in gameFiles)
+                {
+                    using (var filestream = new FileStream(gameFile.LocalPath, FileMode.OpenOrCreate))
+                    {
+                        var memStream = new MemoryStream();
+                        var request = service.Files.Get(gameFile.Id);
+                        request.Download(memStream);
+                        memStream.CopyTo(filestream);
+                    }
+                }
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -59,14 +60,24 @@ namespace carousel_gui.views
             }
         }
 
-        private void StartGameButton_Click(object sender, EventArgs e)
+        private async void StartGameButton_Click(object sender, EventArgs e)
         {
             this._Game.Save();
 
             // validate and attempt to start game
             if (this._CarouselClient != null)
             {
-                throw new NotImplementedException();
+                using (var cts = new CancellationTokenSource())
+                {
+                    this._Game.SetupGame(this._CarouselClient);
+
+                    this._Game.StartGame(cts, (c) =>
+                    {
+                        c.Cancel();
+                    });
+
+                    new ProgressForm(cts, "Running game...").ShowDialog();
+                }
             }
         }
 
@@ -80,6 +91,11 @@ namespace carousel_gui.views
                     this.GameFileDataTable.CurrentCell.Value = dg.FileName;
                 }
             }
+        }
+
+        private async void DeleteBackupsButton_Click(object sender, EventArgs e)
+        {
+            await this._Game.CleanupLocalBackups();
         }
     }
 }
