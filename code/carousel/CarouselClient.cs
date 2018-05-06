@@ -199,5 +199,35 @@ namespace carousel
                 }
             }
         }
+
+        /// <summary>
+        /// takes game's list of files and updates the remote paths accordingly
+        /// </summary>
+        /// <param name="gameFiles">ilist of filedto objects</param>
+        public async Task UploadFiles(IList<FileDto> gameFiles)
+        {
+            if (_UserCredentials != null)
+            {
+                await Task.Run(() =>
+                {
+                    var service = new DriveService(new BaseClientService.Initializer()
+                    {
+                        HttpClientInitializer = this._UserCredentials,
+                        ApplicationName = this._ApplicationName,
+                    });
+
+                    foreach (var gameFile in gameFiles)
+                    {
+                        // var file = service.Files.Get(gameFile.Id).Execute();
+                        var file = new Google.Apis.Drive.v3.Data.File();
+                        var bytes = File.ReadAllBytes(gameFile.LocalPath);
+                        var memStream = new MemoryStream(bytes);
+                        var request = service.Files.Update(file, gameFile.Id, memStream, file.MimeType); 
+                        var progress = request.Upload();
+                        var rep = request.ResponseBody;
+                    }
+                });
+            }
+        }
     }
 }

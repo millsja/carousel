@@ -74,6 +74,7 @@ namespace carousel_gui.views
                     this._Game.StartGame(cts, (c) =>
                     {
                         c.Cancel();
+                        this._Game.UploadLocalFiles(this._CarouselClient);
                     });
 
                     new ProgressForm(cts, "Running game...").ShowDialog();

@@ -264,5 +264,14 @@ namespace carousel.models
         {
             client.DownloadFiles(this.LocalFiles);
         }
+
+        /// <summary>
+        /// uploads game's local files to remote directory 
+        /// </summary>
+        /// <param name="client">carousel client</param>
+        public async Task UploadLocalFiles(CarouselClient client)
+        {
+            client.UploadFiles(this.LocalFiles);
+        }
     }
 }
