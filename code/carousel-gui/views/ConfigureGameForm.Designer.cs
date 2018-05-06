@@ -41,6 +41,7 @@
             // 
             // GameFileDataTable
             // 
+            this.GameFileDataTable.AllowUserToAddRows = false;
             this.GameFileDataTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.GameFileDataTable.Location = new System.Drawing.Point(13, 37);
             this.GameFileDataTable.Name = "GameFileDataTable";
