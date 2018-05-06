@@ -54,6 +54,7 @@
             this.ConfigureGameButton.TabIndex = 1;
             this.ConfigureGameButton.Text = "Configure game";
             this.ConfigureGameButton.UseVisualStyleBackColor = true;
+            this.ConfigureGameButton.Click += new System.EventHandler(this.ConfigureGameButton_Click);
             // 
             // StartGameButton
             // 

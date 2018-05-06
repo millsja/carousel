@@ -1,4 +1,5 @@
 ﻿using carousel;
+using carousel.models;
 using carousel_gui.utilities;
 using carousel_gui.views;
 using System;
@@ -55,7 +56,7 @@ namespace carousel_gui
             settingsForm.ShowDialog();
         }
 
-        private void RefreshButton_Click(object sender, EventArgs e)
+        private async void RefreshButton_Click(object sender, EventArgs e)
         {
             this.GamesListBox.DataSource = _Client.GetGamesList();
         }
@@ -72,6 +73,15 @@ namespace carousel_gui
         private void MainForm_Shown(object sender, EventArgs e)
         {
             this.Initialize();
+        }
+
+        private void ConfigureGameButton_Click(object sender, EventArgs e)
+        {
+            var game = this.GamesListBox.SelectedItem;
+            if (game is GameDto)
+            {
+                new ConfigureGameForm((GameDto)this.GamesListBox.SelectedItem).ShowDialog();
+            }
         }
     }
 }

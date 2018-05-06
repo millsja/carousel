@@ -139,7 +139,9 @@ namespace carousel
         /// <returns>list of game data objects</returns>
         public IList<GameDto> GetGamesList()
         {
-            var root = this.GetFiles((f) => f.Name == Constants.RootPath).First();
+            var filesList = this.GetFiles((f) => true);
+
+            var root = filesList.Where((f) => f.Name == Constants.RootPath).First();
 
             if (root == null)
             {
@@ -148,12 +150,27 @@ namespace carousel
 
             var rootId = root.Id;
 
-            var gamesList = this.GetFiles((f) =>
+            var gamesList = filesList.Where((f) =>
             {
                 return f.Parents != null && f.Parents.Count >= 1 && f.Parents.Last() == rootId;
-            });
+            }).Select(f => new GameDto(f.Id, f.Name)).ToList();
 
-            return gamesList.Select((f) => new GameDto(f.Name)).ToList();
+            foreach (var file in filesList)
+            {
+                if (file.Parents == null || file.Parents.Count == 0)
+                {
+                    continue;
+                }
+
+                var possibleParents = gamesList.Where(g => file.Parents.Contains(g.Id)).ToList();
+
+                if (possibleParents != null && possibleParents.Count >= 1)
+                {
+                    possibleParents.First().AddFile(new FileDto(file.Id, file.Name));
+                }
+            }
+
+            return gamesList;
         }
     }
 }
