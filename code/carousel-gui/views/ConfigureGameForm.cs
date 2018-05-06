@@ -15,6 +15,7 @@ namespace carousel_gui.views
 {
     public partial class ConfigureGameForm : Form
     {
+        private BindingSource _BindingSource;
         private GameDto _Game;
         private CarouselClient _CarouselClient;
 
@@ -26,7 +27,9 @@ namespace carousel_gui.views
             this._Game = game;
             this._Game.Load();
             this.ExePathLabel.Text = this._Game.ExePath;
-            this.GameFileDataTable.DataSource = this._Game.LocalFiles;
+            _BindingSource = new BindingSource();
+            _BindingSource.DataSource = this._Game.LocalFiles;
+            this.GameFileDataTable.DataSource = _BindingSource;
 
             if (this.GameFileDataTable.RowCount >= 1)
             {
@@ -75,6 +78,7 @@ namespace carousel_gui.views
                     {
                         c.Cancel();
                         this._Game.UploadLocalFiles(this._CarouselClient);
+                        this._Game.Save();
                     });
 
                     new ProgressForm(cts, "Running game...").ShowDialog();
@@ -97,6 +101,21 @@ namespace carousel_gui.views
         private async void DeleteBackupsButton_Click(object sender, EventArgs e)
         {
             await this._Game.CleanupLocalBackups();
+        }
+
+        private void AddFile_Click(object sender, EventArgs e)
+        {
+            var loadDiag = new OpenFileDialog();
+            if (loadDiag.ShowDialog() == DialogResult.OK)
+            {
+                this._Game.AddFile(new FileDto(loadDiag.FileName));
+                _BindingSource.ResetBindings(false);
+            }
+        }
+
+        private void RefreshButton_Click(object sender, EventArgs e)
+        {
+            this._BindingSource.ResetBindings(false);
         }
     }
 }

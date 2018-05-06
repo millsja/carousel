@@ -10,5 +10,6 @@ namespace carousel
     {
         public static string SettingsPath = @"app.settings.config";
         public static string RootPath = @"carousel-save-states";
+        public static string MimeTypeDefault = @"application/octet-stream";
     }
 }

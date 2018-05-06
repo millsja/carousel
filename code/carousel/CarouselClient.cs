@@ -189,12 +189,15 @@ namespace carousel
 
                 foreach (var gameFile in gameFiles)
                 {
-                    using (var filestream = new FileStream(gameFile.LocalPath, FileMode.OpenOrCreate))
+                    if (!string.IsNullOrEmpty(gameFile.Id))
                     {
-                        var memStream = new MemoryStream();
-                        var request = service.Files.Get(gameFile.Id);
-                        request.Download(memStream);
-                        memStream.CopyTo(filestream);
+                        using (var filestream = new FileStream(gameFile.LocalPath, FileMode.OpenOrCreate))
+                        {
+                            var memStream = new MemoryStream();
+                            var request = service.Files.Get(gameFile.Id);
+                            request.Download(memStream);
+                            memStream.CopyTo(filestream);
+                        }
                     }
                 }
             }
@@ -204,21 +207,21 @@ namespace carousel
         /// takes game's list of files and updates the remote paths accordingly
         /// </summary>
         /// <param name="gameFiles">ilist of filedto objects</param>
-        public async Task UploadFiles(IList<FileDto> gameFiles)
+        public void UploadFiles(IList<FileDto> gameFiles, string gameId)
         {
             if (_UserCredentials != null)
             {
-                await Task.Run(() =>
+                var service = new DriveService(new BaseClientService.Initializer()
                 {
-                    var service = new DriveService(new BaseClientService.Initializer()
-                    {
-                        HttpClientInitializer = this._UserCredentials,
-                        ApplicationName = this._ApplicationName,
-                    });
+                    HttpClientInitializer = this._UserCredentials,
+                    ApplicationName = this._ApplicationName,
+                });
 
-                    foreach (var gameFile in gameFiles)
+                foreach (var gameFile in gameFiles)
+                {
+                    // remote file exists, simply update
+                    if (!string.IsNullOrEmpty(gameFile.Id))
                     {
-                        // var file = service.Files.Get(gameFile.Id).Execute();
                         var file = new Google.Apis.Drive.v3.Data.File();
                         var bytes = File.ReadAllBytes(gameFile.LocalPath);
                         var memStream = new MemoryStream(bytes);
@@ -226,7 +229,22 @@ namespace carousel
                         var progress = request.Upload();
                         var rep = request.ResponseBody;
                     }
-                });
+                    // remote file does not exists, upload
+                    else
+                    {
+                        var file = new Google.Apis.Drive.v3.Data.File();
+                        file.Name = gameFile.Name;
+                        file.Parents = new List<string>(new string[] {gameId});
+
+                        var bytes = File.ReadAllBytes(gameFile.LocalPath);
+                        var memStream = new MemoryStream(bytes);
+
+                        var request = service.Files.Create(file, memStream, Constants.MimeTypeDefault);
+                        request.Fields = "id";
+                        var ex = request.Upload().Exception;
+                        gameFile.Id = request.ResponseBody.Id;
+                    }
+                }
             }
         }
     }
