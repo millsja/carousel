@@ -1,4 +1,5 @@
 ﻿using carousel;
+using carousel.utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,7 +26,18 @@ namespace carousel_gui.views
 
         private async void RevokeAccessButton_Click(object sender, EventArgs e)
         {
-            await _CarouselClient.RevokeAuthorization(CancellationToken.None);
+            if (_CarouselClient != null)
+            {
+                await _CarouselClient.RevokeAuthorization(CancellationToken.None);
+            }
+        }
+
+        private void NewClientConfigButton_Click(object sender, EventArgs e)
+        {
+            if (_CarouselClient != null)
+            {
+                SettingsManager.Write(_CarouselClient.ToSettings() ,Constants.SettingsPath);
+            }
         }
     }
 }

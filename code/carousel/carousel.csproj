@@ -81,6 +81,8 @@
     <Compile Include="models\GameDto.cs" />
     <Compile Include="models\LocalMachine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="resources\Constants.cs" />
+    <Compile Include="utilities\SettingsManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

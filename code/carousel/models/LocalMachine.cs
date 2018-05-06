@@ -9,5 +9,10 @@ namespace carousel.models
     public class LocalMachine
     {
         public Guid Id { get; set; }
+
+        public LocalMachine(string id)
+        {
+            this.Id = Guid.Parse(id);
+        }
     }
 }

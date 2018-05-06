@@ -1,4 +1,5 @@
 ﻿using carousel.models;
+using carousel.utilities;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
@@ -12,6 +13,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static carousel.utilities.SettingsManager;
 using static Google.Apis.Drive.v3.DriveService;
 using static Google.Apis.Drive.v3.FilesResource;
 
@@ -19,22 +21,42 @@ namespace carousel
 {
     public class CarouselClient
     {
-        private string _GoogleDriveApiKey;
+        private LocalMachine _LocalMachine;
+        private string _RemoteRootPath;
         private UserCredential _UserCredentials;
         private string _ApplicationName = "Carousel save state manager";
 
-        private CarouselClient()
+        private CarouselClient(string remotePath, string localMachineId)
         {
+            this._RemoteRootPath = remotePath;
+            this._LocalMachine = new LocalMachine(localMachineId);
         }
 
-        public static async Task<CarouselClient> CreateInstance(string userName)
+        /// <summary>
+        /// attempts to read client settings from file
+        /// </summary>
+        /// <returns>new client on success</returns>
+        public static async Task<CarouselClient> CreateInstance(CancellationTokenSource cts)
         {
-            var client = new CarouselClient();
-            await client.Authorize(userName, CancellationToken.None);
+            var clientSettings = SettingsManager.Load(Constants.SettingsPath);
+            if (clientSettings.HasBlanks)
+            {
+                throw new NotImplementedException();
+            }
+
+            var client = new CarouselClient(clientSettings.RemotePath, clientSettings.LocalMachineId);
+            await client.Authorize(clientSettings.UserName, cts);
+
             return client;
         }
 
-        private async Task Authorize(string userName, CancellationToken cancelToken)
+        /// <summary>
+        /// prompts user to authorize application to access their Google Drive
+        /// </summary>
+        /// <param name="userName">user's Google account name</param>
+        /// <param name="cancelToken">cancel token object</param>
+        /// <returns>task</returns>
+        private async Task Authorize(string userName, CancellationTokenSource cts)
         {
             var scopes = new string[] { DriveService.Scope.Drive };
 
@@ -44,10 +66,15 @@ namespace carousel
                     GoogleClientSecrets.Load(fileStream).Secrets,
                     scopes,
                     userName,
-                    cancelToken);
+                    cts.Token);
             }
         }
 
+        /// <summary>
+        /// revokes application's access to user's Google drive
+        /// </summary>
+        /// <param name="cancelToken">cancel token</param>
+        /// <returns>task</returns>
         public async Task RevokeAuthorization(CancellationToken cancelToken)
         {
             if (_UserCredentials != null)
@@ -56,7 +83,22 @@ namespace carousel
             }
         }
 
-        public IList<GameDto> GetGamesList()
+        public SettingsDto ToSettings()
+        {
+            return new SettingsDto()
+            {
+                LocalMachineId = this._LocalMachine.Id.ToString(),
+                RemotePath = this._RemoteRootPath,
+                UserName = this._UserCredentials.UserId,
+            };
+        }
+
+        /// <summary>
+        /// gets file list from remote directory
+        /// </summary>
+        /// <param name="filter">filter to apply to file list</param>
+        /// <returns>files list</returns>
+        public IList<Google.Apis.Drive.v3.Data.File> GetFiles(Predicate<Google.Apis.Drive.v3.Data.File> filter)
         {
             if (_UserCredentials != null)
             {
@@ -67,16 +109,51 @@ namespace carousel
                 });
 
                 var listRequest = service.Files.List();
-                listRequest.PageSize = 10;
-                listRequest.Fields = "nextPageToken, files(id, name)";
+                listRequest.PageSize = 500;
+                listRequest.Fields = "nextPageToken, files(id, name, parents)";
 
 
-                var files = listRequest.Execute().Files;
+                var fullFileList = new List<Google.Apis.Drive.v3.Data.File>();
+                var page = new List<Google.Apis.Drive.v3.Data.File>();
 
-                return files.Select((f) => new GameDto(f.Name)).ToList();
+                do
+                {
+                    var response = listRequest.Execute();
+                    page = response.Files.ToList();
+                    fullFileList.AddRange(page.Where((f) => filter(f)));
+                    var names = page.Select((p) => p.Name).ToList<string>();
+                    listRequest.PageToken = response.NextPageToken;
+                } while (listRequest.PageToken != null);
+
+                return fullFileList;
+                // return fullGamesList.Select((f) => new GameDto(f.Name)).ToList();
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// gets the list of files whose immediate parent is the root folder, i.e. the
+        /// game folders
+        /// </summary>
+        /// <returns>list of game data objects</returns>
+        public IList<GameDto> GetGamesList()
+        {
+            var root = this.GetFiles((f) => f.Name == Constants.RootPath).First();
+
+            if (root == null)
+            {
+                return null;
+            }
+
+            var rootId = root.Id;
+
+            var gamesList = this.GetFiles((f) =>
+            {
+                return f.Parents != null && f.Parents.Count >= 1 && f.Parents.Last() == rootId;
+            });
+
+            return gamesList.Select((f) => new GameDto(f.Name)).ToList();
         }
     }
 }

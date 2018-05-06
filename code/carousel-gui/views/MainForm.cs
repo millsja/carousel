@@ -1,4 +1,5 @@
 ﻿using carousel;
+using carousel_gui.utilities;
 using carousel_gui.views;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -22,10 +24,18 @@ namespace carousel_gui
 
             var logoImage = Properties.Resources.carousel_logo.GetHicon();
             this.Icon = Icon.FromHandle(logoImage);
+        }
 
+        internal async Task Initialize()
+        {
             try
             {
-                _Client = CarouselClient.CreateInstance("jamesalfredmills@gmail.com").Result;
+                // var worker = new ProgressWorker();
+                // await worker.Run((cts) =>
+                // {
+                var cts = new CancellationTokenSource();
+                _Client = CarouselClient.CreateInstance(cts).Result;
+                // });
             }
             catch (Exception)
             {
@@ -33,7 +43,10 @@ namespace carousel_gui
                 return;
             }
 
-            this.GamesListBox.DataSource = _Client.GetGamesList();
+            using (var cts = new CancellationTokenSource())
+            {
+                this.GamesListBox.DataSource = _Client.GetGamesList();
+            }
         }
 
         private void SettingsButton_Click(object sender, EventArgs e)
@@ -45,6 +58,20 @@ namespace carousel_gui
         private void RefreshButton_Click(object sender, EventArgs e)
         {
             this.GamesListBox.DataSource = _Client.GetGamesList();
+        }
+
+        private void GamesListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.GamesListBox.SelectedIndex == -1)
+            {
+                this.ConfigureGameButton.Enabled = false;
+                this.StartGameButton.Enabled = false;
+            }
+        }
+
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            this.Initialize();
         }
     }
 }
