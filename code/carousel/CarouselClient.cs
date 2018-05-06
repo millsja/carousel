@@ -36,9 +36,10 @@ namespace carousel
         /// attempts to read client settings from file
         /// </summary>
         /// <returns>new client on success</returns>
-        public static async Task<CarouselClient> CreateInstance(CancellationTokenSource cts)
+        public static async Task<CarouselClient> CreateInstance(CancellationTokenSource cts, Func<string> userNameInput=null)
         {
-            var clientSettings = SettingsManager.Load(Constants.SettingsPath);
+            var clientSettings = SettingsManager.Initialize(Constants.SettingsPath, userNameInput);
+
             if (clientSettings.HasBlanks)
             {
                 throw new NotImplementedException();
@@ -62,11 +63,11 @@ namespace carousel
 
             using (var fileStream = new FileStream(@"resources\client-secret.json", FileMode.Open, FileAccess.Read))
             {
-                this._UserCredentials = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                this._UserCredentials = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(fileStream).Secrets,
                     scopes,
                     userName,
-                    cts.Token);
+                    cts.Token).Result;
             }
         }
 

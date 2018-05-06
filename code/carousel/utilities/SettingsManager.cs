@@ -15,7 +15,7 @@ namespace carousel.utilities
         /// </summary>
         /// <param name="settingsPath">path of settings file</param>
         /// <returns></returns>
-        public static SettingsDto Load(string settingsPath)
+        public static SettingsDto Initialize(string settingsPath, Func<string> userNameInput)
         {
             string jsonSettings = string.Empty;
 
@@ -28,11 +28,36 @@ namespace carousel.utilities
 
                 var settings = Newtonsoft.Json.JsonConvert.DeserializeObject<SettingsDto>(jsonSettings);
 
+                if (string.IsNullOrEmpty(settings.UserName))
+                {
+                    throw new Exception("Error: username required");
+                }
+
                 return settings;
             }
             catch (Exception)
             {
-                return new SettingsDto();
+                string userName = string.Empty;
+                if (userNameInput != null)
+                {
+                    userName = userNameInput();
+                }
+
+                var settings = new SettingsDto()
+                {
+                    LocalMachineId = Guid.NewGuid().ToString(),
+                    RemotePath = Constants.RootPath,
+                    UserName = userName,
+                };
+
+                var newJsonSettings = Newtonsoft.Json.JsonConvert.SerializeObject(settings);
+
+                using (var writer = new StreamWriter(Constants.SettingsPath))
+                {
+                    writer.Write(newJsonSettings);
+                }
+
+                return settings;
             }
         }
 

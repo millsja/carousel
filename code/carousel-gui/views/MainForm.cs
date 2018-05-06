@@ -34,7 +34,12 @@ namespace carousel_gui
                 // await worker.Run((cts) =>
                 // {
                 var cts = new CancellationTokenSource();
-                _Client = CarouselClient.CreateInstance(cts).Result;
+                _Client = CarouselClient.CreateInstance(cts, () =>
+                {
+                    var prompt = new TextPrompt("Please enter your Google username");
+                    prompt.ShowDialog();
+                    return prompt.TextResult;
+                }).Result;
                 // });
             }
             catch (Exception)
